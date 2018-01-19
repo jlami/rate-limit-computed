@@ -39,8 +39,9 @@ export default function debouncedProperty() {
   args.push(function(key, value, oldValue) {
     if (__isNotifying) {
       __isNotifying = false;
-      return;
+      return __value;
     }
+    
     if (!__onDestroy) {
       var _super = this.willDestroy;
       this.willDestroy = function() {

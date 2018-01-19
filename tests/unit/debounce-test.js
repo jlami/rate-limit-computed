@@ -1,6 +1,7 @@
 import Ember from "ember";
 import { module, test } from 'qunit';
 import startApp from '../helpers/start-app';
+import { getController } from '../helpers/custom-helpers';
 var App;
 
 module('Ember.computed.debounce Integration Tests', {
@@ -19,7 +20,7 @@ test("Ember.computed.debounce updates property values correctly", function(asser
   assert.expect(12);
   visit('/');
 
-  var controller = getController('application');
+  var controller = getController(App, 'application');
 
   andThen(function () {
 

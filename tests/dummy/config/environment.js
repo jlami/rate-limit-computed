@@ -1,30 +1,27 @@
-/* jshint node: true */
+/* eslint-env node */
+'use strict';
 
 module.exports = function(environment) {
-  var ENV = {
+  let ENV = {
     modulePrefix: 'dummy',
-    environment: environment,
-    baseURL: '/',
-    locationType: 'hash',
+    environment,
+    rootURL: '/',
+    locationType: 'auto',
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
+      },
+      EXTEND_PROTOTYPES: {
+        // Prevent Ember Data from overriding Date.parse.
+        Date: false
       }
     },
 
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    },
-
-    contentSecurityPolicy: {
-      'font-src': "'self' https://maxcdn.bootstrapcdn.com http://fonts.googleapis.com http://fonts.gstatic.com",
-      'img-src': "'self' https://maxcdn.bootstrapcdn.com",
-      'style-src': "'unsafe-inline' 'self' https://maxcdn.bootstrapcdn.com http://fonts.googleapis.com http://fonts.gstatic.com",
-      'media-src': "'self' https://maxcdn.bootstrapcdn.com"
     }
-
   };
 
   if (environment === 'development') {
@@ -37,7 +34,6 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     // Testem prefers this...
-    ENV.baseURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter
@@ -45,10 +41,11 @@ module.exports = function(environment) {
     ENV.APP.LOG_VIEW_LOOKUPS = false;
 
     ENV.APP.rootElement = '#ember-testing';
+    ENV.APP.autoboot = false;
   }
 
   if (environment === 'production') {
-
+    // here you can enable a production-specific feature
   }
 
   return ENV;
