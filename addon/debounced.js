@@ -31,14 +31,16 @@ export default function debouncedProperty() {
         if (!this.get('isDestroying')) {
           join(this, this.propertyDidChange, key);
         }
-      } else {
-        __isNotifying = false;
       }
     }
 
   };
 
   args.push(function(key, value, oldValue) {
+    if (__isNotifying) {
+      __isNotifying = false;
+      return;
+    }
     if (!__onDestroy) {
       var _super = this.willDestroy;
       this.willDestroy = function() {
