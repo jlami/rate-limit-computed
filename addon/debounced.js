@@ -26,10 +26,14 @@ export default function debouncedProperty() {
 
     if (!this.get('isDestroyed')) {
       if (!__isNotifying) {
-        __isNotifying = true;
+        let tags = Ember.meta(this).readableTags();
+        let tag = tags && tags[key];
+        let rev = tag && tag.value();
         __value = method.call(this, key, value, oldValue);
+        __isNotifying = (!tag || tag.validate(rev));
+        
         if (!this.get('isDestroying')) {
-          join(this, this.propertyDidChange, key);
+          join(this, 'notifyPropertyChange', key);
         }
       }
     }
