@@ -22,23 +22,18 @@ export default function debouncedProperty() {
   var __onDestroy = false;
   var __isNotifying = false;
 
-  function debug(label, obj) {
-    let meta = Ember.meta(obj);
-    console.log(label, meta._deps.count, meta._watching.count, meta._watching.squared);
-  }
   var methodFn = function(key, value, oldValue) {
 
     if (!this.get('isDestroyed')) {
       if (!__isNotifying) {
-        __isNotifying = true;
-        debug('calling', this);
+        let tags = Ember.meta(this).readableTags();
+        let tag = tags && tags[key];
+        let rev = tag && tag.value();
         __value = method.call(this, key, value, oldValue);
+        __isNotifying = (!tag || tag.validate(rev));
+        
         if (!this.get('isDestroying')) {
-          debug('pre', this);
-          __isNotifying = Ember.meta(this)._deps.count[key];//Ember.meta(this)._deps contains key;
-          
-          this.notifyPropertyChange(key);
-          debug('post', this);
+          join(this, 'notifyPropertyChange', key);
         }
       }
     }
@@ -47,7 +42,6 @@ export default function debouncedProperty() {
 
   args.push(function(key, value, oldValue) {
     if (__isNotifying) {
-      debug('computed', this);
       __isNotifying = false;
       return __value;
     }
