@@ -30,11 +30,11 @@ export default function debouncedProperty() {
         let tag = tags && tags[key];
         let rev = tag && tag.value();
         __value = method.call(this, key, value, oldValue);
-        __isNotifying = (!tag || tag.validate(rev));
         
-        if (!this.get('isDestroying')) {
-          join(this, 'notifyPropertyChange', key);
-        }
+        join(this, () => {
+          __isNotifying = (!tag || tag.validate(rev));
+          this.notifyPropertyChange(key);
+        });
       }
     }
 
