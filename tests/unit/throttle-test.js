@@ -20,7 +20,7 @@ test("Ember.computed.throttle updates property values correctly", function(asser
   assert.expect(9);
   visit('/');
 
-  var controller = getController(App, 'application');
+  var controller = getController(App, 'index');
 
   andThen(function () {
 

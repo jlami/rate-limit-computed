@@ -20,7 +20,7 @@ test("Ember.computed.debounce updates property values correctly", function(asser
   assert.expect(12);
   visit('/');
 
-  var controller = getController(App, 'application');
+  var controller = getController(App, 'index');
 
   andThen(function () {
 
@@ -51,3 +51,27 @@ test("Ember.computed.debounce updates property values correctly", function(asser
 
 });
 
+test("Ember.computed.debounce does not ignore update triggers", function(assert) {
+  assert.expect(8);
+  visit('/dont-ignore-updates');
+
+  var controller = getController(App, 'dont-ignore-updates');
+
+  andThen(function () {
+
+    assert.equal(controller.get('count'), 0, 'The count begins at 0');
+    assert.equal(controller.get('squaredTriggered'), 1, 'The computed property was triggered once during setup.');
+    assert.equal(find('#squaredValue').text(), '0', 'The Screen reflects the correct initial value.');
+    assert.equal(controller.get('squared'), 0, 'The computed property is set correctly during setup.');
+
+    click('#plusOne');
+
+    andThen(function() {
+      assert.equal(controller.get('count'), 2, 'The count was incremented to 2.');
+      assert.equal(controller.get('squaredTriggered'), 3, 'The computed property triggers correctly.');
+      assert.equal(find('#squaredValue').text(), '4', 'The Screen reflects the correct updated value.');
+      assert.equal(controller.get('squared'), 4, 'The computed property reflects the correct value.');
+    });
+
+  });
+});
