@@ -20,43 +20,35 @@ export default function debouncedProperty() {
   var __value = null;
   var __next = null;
   var __onDestroy = false;
-  var __isNotifying = false;
 
   var methodFn = function(key, value, oldValue) {
-
     if (!this.get('isDestroyed')) {
-      if (!__isNotifying) {
-        let tags = Ember.meta(this).readableTags();
-        let tag = tags && tags[key];
-        let rev = tag && tag.value();
         __value = method.call(this, key, value, oldValue);
-        
-        join(this, () => {
-          __isNotifying = (!tag || tag.validate(rev));
-          this.notifyPropertyChange(key);
-        });
-      }
+        if (!this.get('isDestroying')) {
+          join(this, this.set, key, __value);//updates computed.cache and notifies dependents
+        }
     }
-
   };
-
-  args.push(function(key, value, oldValue) {
-    if (__isNotifying) {
-      __isNotifying = false;
+  
+  let getset = {
+    get(key, value, oldValue) {
+      if (!__onDestroy) {
+        var _super = this.willDestroy;
+        this.willDestroy = function() {
+          cancel(__next);
+          _super.apply(this);
+        };
+        __onDestroy = true;
+      }
+      __next = debounce(this, methodFn, key, value, oldValue, rate, false);
       return __value;
+    },
+    set(key, value) {
+      return value;//ember computed does the caching
     }
-    
-    if (!__onDestroy) {
-      var _super = this.willDestroy;
-      this.willDestroy = function() {
-        cancel(__next);
-        _super.apply(this);
-      };
-      __onDestroy = true;
-    }
-    __next = debounce(this, methodFn, key, value, oldValue, rate, false);
-    return __value;
-  });
+  }
+
+  args.push(getset);
   return computed.apply(this, args);
 
 }
